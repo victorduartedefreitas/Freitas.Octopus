@@ -1,2 +1,2 @@
 # Freitas.Octopus
-create forms and speed up your inspections
+Algorithms to generate position values.
