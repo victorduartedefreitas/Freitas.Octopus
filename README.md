@@ -1,2 +1,2 @@
 # Freitas.Octopus
-Algorithms to generate position values.
+Generate position values for your collection items.
