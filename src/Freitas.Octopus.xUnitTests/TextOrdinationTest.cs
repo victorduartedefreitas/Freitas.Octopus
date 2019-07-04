@@ -36,13 +36,14 @@ namespace Freitas.Octopus.xUnitTests
         }
 
         [Theory]
-        [InlineData("AAAA", "AAAE")]
-        [InlineData("AAAA", "AAAC")]
-        [InlineData("AAAA", "AAAB")]
-        [InlineData("AAAA", "AAAAE")]
-        [InlineData("AAAE", "AAAI")]
-        [InlineData("AAAAC", "AAAAE")]
-        [InlineData("AAAAC", "AAAAD")]
+        [InlineData("AZAX", "AZZZ")]
+        //[InlineData("AAAA", "AAAE")]
+        //[InlineData("AAAA", "AAAC")]
+        //[InlineData("AAAA", "AAAB")]
+        //[InlineData("AAAA", "AAAAE")]
+        //[InlineData("AAAE", "AAAI")]
+        //[InlineData("AAAAC", "AAAAE")]
+        //[InlineData("AAAAC", "AAAAD")]
         public void GetInnerPositionTest(string previous, string next)
         {
             var inner = TextOrdination.Instance.GenerateOrdination(previous, next);

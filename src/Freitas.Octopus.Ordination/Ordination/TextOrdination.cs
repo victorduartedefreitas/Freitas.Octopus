@@ -1,4 +1,7 @@
-﻿namespace Freitas.Octopus.Ordination
+﻿using System.Collections;
+using System.Collections.Generic;
+
+namespace Freitas.Octopus.Ordination
 {
     public sealed class TextOrdination
     {
@@ -60,13 +63,18 @@
             var allChars = previousPosition.ToCharArray();
             for (int i = previousPosition.Length - 1; i >= 0; i--)
             {
-                if (((int)allChars[i] + jump) > letterZ)
+                if (allChars[i] != letterZ && (allChars[i] + jump) > letterZ)
+                {
+                    allChars[i] = 'Z';
+                    continue;
+                }
+                else if (allChars[i] == letterZ)
                 {
                     allChars[i] = 'A';
                     continue;
                 }
 
-                allChars[i] = (char)((int)allChars[i] + jump);
+                allChars[i] = (char)(allChars[i] + jump);
                 break;
             }
 
@@ -75,56 +83,86 @@
 
         private string GetInnerPosition(string previousPosition, string nextPosition)
         {
+            if (previousPosition.Length == nextPosition.Length)
+                return GetInnerPositionSameLenght(previousPosition, nextPosition);
+            else if (nextPosition.Length > previousPosition.Length)
+                return GetInnerPositionNextGTPrevious(previousPosition, nextPosition);
+            else
+                return GetInnerPositionPreviousGTNext(previousPosition, nextPosition);
+        }
+
+        private string GetInnerPositionSameLenght(string previousPosition, string nextPosition)
+        {
             char[] allPrevChars = previousPosition.ToCharArray(),
                    allNextChars = nextPosition.ToCharArray();
 
-            int lastPrevChar = (int)allPrevChars[allPrevChars.Length - 1],
-                lastNextChar = (int)allNextChars[allNextChars.Length - 1];
+            int lastPrevChar = allPrevChars[allPrevChars.Length - 1],
+                lastNextChar = allNextChars[allNextChars.Length - 1];
 
-            if (previousPosition.Length == nextPosition.Length)
+            int newChar;
+            if ((lastNextChar - lastPrevChar) > 1)
             {
-                int newChar;
-                if ((lastNextChar - lastPrevChar) > 1)
-                {
-                    newChar = lastPrevChar + ((lastNextChar - lastPrevChar) / 2);
-                    var newPosition = allPrevChars;
-                    newPosition[newPosition.Length - 1] = (char)newChar;
-                    return new string(newPosition);
-                }
-                else
-                {
-                    var newPosition = new char[allPrevChars.Length + 1];
-                    for (int i = 0; i < allPrevChars.Length; i++)
-                        newPosition[i] = allPrevChars[i];
-
-                    newPosition[newPosition.Length - 1] = (char)(letterA + jump);
-                    return new string(newPosition);
-                }
-            }
-            else if (nextPosition.Length > previousPosition.Length)
-            {
-                int newChar = letterA + ((lastNextChar - letterA) / 2);
-                var newPosition = new char[allPrevChars.Length + 1];
-                for (int i = 0; i < allPrevChars.Length; i++)
-                    newPosition[i] = allPrevChars[i];
-
+                newChar = lastPrevChar + ((lastNextChar - lastPrevChar) / 2);
+                var newPosition = allPrevChars;
                 newPosition[newPosition.Length - 1] = (char)newChar;
                 return new string(newPosition);
             }
             else
             {
-                //string lastPosition = GetLastPosition(previousPosition);
-                return string.Empty;
-                //TODO: Pensar nesta lógica:
+                var newPosition = new char[allPrevChars.Length + 1];
+                for (int i = 0; i < allPrevChars.Length; i++)
+                    newPosition[i] = allPrevChars[i];
 
-                //AAAAY
-                //AAAAAE --este é o valor correto neste caso
-                //AAAB
-
-                //AAAAY
-                //AAACA --este é o valor correto neste caso
-                //AAAE
+                newPosition[newPosition.Length - 1] = (char)(letterA + jump);
+                return new string(newPosition);
             }
+        }
+
+        private string GetInnerPositionNextGTPrevious(string previousPosition, string nextPosition)
+        {
+            char[] allPrevChars = previousPosition.ToCharArray(),
+                   allNextChars = nextPosition.ToCharArray();
+
+            int lastNextChar = allNextChars[allNextChars.Length - 1];
+
+            int newChar = letterA + ((lastNextChar - letterA) / 2);
+            var newPosition = new char[allPrevChars.Length + 1];
+            for (int i = 0; i < allPrevChars.Length; i++)
+                newPosition[i] = allPrevChars[i];
+
+            newPosition[newPosition.Length - 1] = (char)newChar;
+            return new string(newPosition);
+        }
+
+        private string GetInnerPositionPreviousGTNext(string previousPosition, string nextPosition)
+        {
+            char[] allPrevChars = previousPosition.ToCharArray(),
+                   allNextChars = nextPosition.ToCharArray();
+
+            int lastPrevChar = allPrevChars[allPrevChars.Length - 1],
+                lastNextChar = allNextChars[allNextChars.Length - 1];
+
+            
+            if ((lastPrevChar + jump) > letterZ)
+            {
+                int penultimatePrevChar = (int)allPrevChars[allPrevChars.Length - 2];
+                if ((lastNextChar - penultimatePrevChar) == 1)
+                {
+                    //AAAAY
+                    //AAAAAE --este é o valor correto neste caso
+                    //AAAB
+                    char[] allNewChars = new char[allPrevChars.Length + 1];
+                    
+                }
+                else
+                {
+                    //AAAAY
+                    //AAACA --este é o valor correto neste caso
+                    //AAAE
+                }
+            }
+
+            return string.Empty;
         }
 
         #endregion
