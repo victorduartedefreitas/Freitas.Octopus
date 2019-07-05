@@ -22,3 +22,4 @@ To sort your list, you can use the `OctopusOrderBy` extension method for IList<T
 
 IMAGE
 
+#### That's all, folks. And here's a (simple) example of a list using Freitas.Octopus.
