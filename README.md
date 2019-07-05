@@ -24,5 +24,5 @@ To sort your list, you can use the `OctopusOrderBy` extension method for IList<T
 You can also move items using the following extension methods: `MoveUp` and `MoveDown`
 
 ![MoveMethods](https://github.com/victorduartedefreitas/Freitas.Octopus/blob/master/res/MoveUp%20and%20MoveDown.png)
-
+ 
 #### That's all, folks. And here's a (simple) example of a list using Freitas.Octopus.
