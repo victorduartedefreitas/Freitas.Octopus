@@ -3,8 +3,6 @@ Generate position values for your collection items.
 
 You can download this library on NuGet: Freitas.Octopus (https://www.nuget.org/packages/Freitas.Octopus)
 
-INTRO
-
 ### Now, you may be wondering: how can I use Freitas.Octopus? Follow me, I'll teach you!
 
 First of all, you have to create a listitem class (or modify your current listitem class) that implements `IOctopusItem` interface.
