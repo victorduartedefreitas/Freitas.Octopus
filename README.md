@@ -26,3 +26,5 @@ You can also move items using the following extension methods: `MoveUp` and `Mov
 ![MoveMethods](https://github.com/victorduartedefreitas/Freitas.Octopus/blob/master/res/MoveUp%20and%20MoveDown.png)
  
 #### That's all, folks. And here's a (simple) example of a list using Freitas.Octopus.
+
+![demo1](https://github.com/victorduartedefreitas/Freitas.Octopus/blob/master/res/demo.png)
