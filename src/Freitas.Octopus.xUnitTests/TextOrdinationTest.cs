@@ -1,15 +1,79 @@
-using Freitas.Octopus.Ordination;
-using System;
+using System.Collections.Generic;
 using Xunit;
+using System.Linq;
 
 namespace Freitas.Octopus.xUnitTests
 {
     public class TextOrdinationTest
     {
+        private IList<Item> GetCleanItems()
+        {
+            return new List<Item>
+            {
+                new Item("Item 001"),
+                new Item("New item"),
+                new Item("Cellphone"),
+                new Item("Notebook"),
+                new Item("Mouse"),
+                new Item("Tablet"),
+                new Item("Photo"),
+                new Item("Water bottle"),
+                new Item("Bible"),
+                new Item("Book"),
+                new Item("Macbook"),
+                new Item("iMac"),
+                new Item("Trash"),
+                new Item("Paper"),
+                new Item("Chair"),
+                new Item("Table"),
+                new Item("TV"),
+                new Item("Cup"),
+                new Item("Trash"),
+                new Item("F1"),
+                new Item("F2"),
+                new Item("F3"),
+                new Item("F4"),
+                new Item("F5"),
+                new Item("F6"),
+                new Item("F7"),
+                new Item("F8"),
+                new Item("F9"),
+                new Item("F10"),
+                new Item("F11"),
+                new Item("F12"),
+                new Item("LetterA"),
+                new Item("LetterB"),
+                new Item("LetterC"),
+                new Item("LetterD"),
+                new Item("LetterE"),
+                new Item("LetterF"),
+                new Item("LetterG"),
+                new Item("LetterH"),
+                new Item("LetterI"),
+                new Item("LetterJ"),
+                new Item("LetterK"),
+                new Item("LetterL"),
+                new Item("LetterM"),
+                new Item("LetterN"),
+                new Item("LetterO"),
+                new Item("LetterP"),
+                new Item("LetterQ"),
+                new Item("LetterR"),
+                new Item("LetterS"),
+                new Item("LetterT"),
+                new Item("LetterU"),
+                new Item("LetterV"),
+                new Item("LetterW"),
+                new Item("LetterX"),
+                new Item("LetterY"),
+                new Item("LetterZ")
+            };
+        }
+
         [Fact]
         public void GetFirstPositionTest()
         {
-            var firstPosition = TextOrdination.Instance.GenerateOrdination();
+            var firstPosition = OctopusPositionGenerator.Instance.GeneratePositionValue();
             Assert.True(firstPosition == "AAAA");
         }
 
@@ -17,36 +81,45 @@ namespace Freitas.Octopus.xUnitTests
         [InlineData("AAAA")]
         [InlineData("AAAE")]
         [InlineData("AAAY")]
+        [InlineData("AAAZ")]
         [InlineData("AAAAE")]
         [InlineData("AAAAY")]
         public void GetLastPositionTest(string previous)
         {
-            var last = TextOrdination.Instance.GenerateOrdination(previous);
+            var last = OctopusPositionGenerator.Instance.GeneratePositionValue(previous);
 
             if (previous == "AAAA")
                 Assert.True(last == "AAAE");
             else if (previous == "AAAE")
                 Assert.True(last == "AAAI");
             else if (previous == "AAAY")
-                Assert.True(last == "AAEA");
+                Assert.True(last == "AAAZ");
             else if (previous == "AAAAE")
                 Assert.True(last == "AAAAI");
             else if (previous == "AAAAY")
-                Assert.True(last == "AAAAI");
+                Assert.True(last == "AAAAZ");
+            else if (previous == "AAAZ")
+                Assert.True(last == "AAEA");
         }
 
         [Theory]
         [InlineData("AZAX", "AZZZ")]
-        //[InlineData("AAAA", "AAAE")]
-        //[InlineData("AAAA", "AAAC")]
-        //[InlineData("AAAA", "AAAB")]
-        //[InlineData("AAAA", "AAAAE")]
-        //[InlineData("AAAE", "AAAI")]
-        //[InlineData("AAAAC", "AAAAE")]
-        //[InlineData("AAAAC", "AAAAD")]
+        [InlineData("AAAA", "AAAE")]
+        [InlineData("AAAA", "AAAC")]
+        [InlineData("AAAA", "AAAB")]
+        [InlineData("AAAA", "AAAAE")]
+        [InlineData("AAAE", "AAAI")]
+        [InlineData("AAAAC", "AAAAE")]
+        [InlineData("AAAAC", "AAAAD")]
+        [InlineData("AAAAZ", "AAAC")]
+        [InlineData("AAAAZ", "AAAB")]
+        [InlineData("AAAAY", "AAAB")]
+        [InlineData("AAAAW", "AAAB")]
+        [InlineData("AAAAE", "AAAB")]
+        [InlineData("AABCZ", "AABEE")]
         public void GetInnerPositionTest(string previous, string next)
         {
-            var inner = TextOrdination.Instance.GenerateOrdination(previous, next);
+            var inner = OctopusPositionGenerator.Instance.GeneratePositionValue(previous, next);
 
             if (previous == "AAAA" && next == "AAAE")
                 Assert.True(inner == "AAAC");
@@ -62,6 +135,42 @@ namespace Freitas.Octopus.xUnitTests
                 Assert.True(inner == "AAAAD");
             else if (previous == "AAAAC" && next == "AAAAD")
                 Assert.True(inner == "AAAACE");
+            else if (previous == "AAAAZ" && next == "AAAC")
+                Assert.True(inner == "AAAB");
+            else if (previous == "AAAAZ" && next == "AAAB")
+                Assert.True(inner == "AAAAZA");
+            else if (previous == "AAAAY" && next == "AAAB")
+                Assert.True(inner == "AAAAZ");
+            else if (previous == "AAAAW" && next == "AAAB")
+                Assert.True(inner == "AAAAY");
+            else if (previous == "AAAAE" && next == "AAAB")
+                Assert.True(inner == "AAAAI");
+            else if (previous == "AABCZ" && next == "AABEE")
+                Assert.True(inner == "AABCZE");
+        }
+
+        [Fact]
+        public void OrderListTest()
+        {
+            IList<Item> items = GetCleanItems();
+            items.InitializeOctopusOrdination();
+
+            var letterA = items.FirstOrDefault(f => f.Name == "LetterA");
+            var f11 = items.FirstOrDefault(f => f.Name == "F11");
+
+            items = items.MoveUp(f11);
+            items = items.MoveUp(items[0]);
+            items = items.MoveUp(items[1]);
+            items = items.MoveUp(items[2]);
+            items = items.MoveUp(letterA);
+
+            items = items.MoveDown(items[0]);
+            items = items.MoveDown(items[1]);
+            items = items.MoveDown(items[2]);
+            items = items.MoveDown(items[items.Count - 1]);
+            items = items.MoveDown(items[items.Count - 2]);
+            items = items.MoveDown(items[items.Count - 3]);
+
         }
     }
 }

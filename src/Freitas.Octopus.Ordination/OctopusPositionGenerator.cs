@@ -1,13 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-
-namespace Freitas.Octopus.Ordination
+﻿namespace Freitas.Octopus
 {
-    public sealed class TextOrdination
+    public sealed class OctopusPositionGenerator
     {
         #region Constructors
 
-        private TextOrdination()
+        private OctopusPositionGenerator()
         {
         }
 
@@ -15,21 +12,21 @@ namespace Freitas.Octopus.Ordination
 
         #region Fields
 
-        private static TextOrdination instance;
-        private int letterA = 'A', //65
-                    letterZ = 'Z', //90
-                    jump = 4;
+        private static OctopusPositionGenerator instance;
+        private readonly int letterA = 'A';
+        private readonly int letterZ = 'Z';
+        private readonly int jump = 4;
 
         #endregion
 
         #region Properties
 
-        public static TextOrdination Instance
+        public static OctopusPositionGenerator Instance
         {
             get
             {
                 if (instance == null)
-                    instance = new TextOrdination();
+                    instance = new OctopusPositionGenerator();
 
                 return instance;
             }
@@ -39,12 +36,14 @@ namespace Freitas.Octopus.Ordination
 
         #region Public Methods
 
-        public string GenerateOrdination(string previousPosition = null, string nextPosition = null)
+        public string GeneratePositionValue(string previousPosition = null, string nextPosition = null)
         {
-            if (string.IsNullOrEmpty(previousPosition))
+            if (string.IsNullOrEmpty(previousPosition) && string.IsNullOrEmpty(nextPosition))
                 return GetFirstPosition();
-            else if (string.IsNullOrEmpty(nextPosition))
+            else if (!string.IsNullOrEmpty(previousPosition) && string.IsNullOrEmpty(nextPosition))
                 return GetNextPosition(previousPosition.ToUpper());
+            else if (string.IsNullOrEmpty(previousPosition) && !string.IsNullOrEmpty(nextPosition))
+                return GetInnerPosition("AAAA", nextPosition.ToUpper());
             else
                 return GetInnerPosition(previousPosition.ToUpper(), nextPosition.ToUpper());
         }
@@ -53,11 +52,9 @@ namespace Freitas.Octopus.Ordination
 
         #region Private Methods
 
-
-
         private string GetFirstPosition()
         {
-            return "AAAA";
+            return "AAAB";
         }
 
         private string GetNextPosition(string previousPosition)
@@ -72,11 +69,20 @@ namespace Freitas.Octopus.Ordination
                 }
                 else if (i == (previousPosition.Length - 1) && allChars[i] == letterZ)
                 {
-                    allChars[i] = 'A';
+                    allChars[i] = (char)letterA;
                     continue;
                 }
 
-                allChars[i] = (char)(allChars[i] + jump);
+                if ((char)(allChars[i] + jump) > letterZ)
+                {
+                    allChars[i - 1] = (char)(allChars[i - 1] + jump);
+                    allChars[i] = (char)letterA;
+                }
+                else
+                {
+                    allChars[i] = (char)(allChars[i] + jump);
+                }
+
                 break;
             }
 
@@ -97,25 +103,6 @@ namespace Freitas.Octopus.Ordination
         {
             char[] allPrevChars = previousPosition.ToCharArray(),
                    allNextChars = nextPosition.ToCharArray();
-
-            //elimina os caracteres iniciais que são iguais, e vou trabalhar apenas com os últimos caracteres que são diferentes
-            int initEquals = 0;
-            for (int i = 0; i < allPrevChars.Length; i++)
-            {
-                if (allPrevChars[i] == allNextChars[i])
-                    initEquals++;
-                else
-                    break;
-            }
-
-            for (int i = allPrevChars.Length - 1; i > initEquals; i--)
-            {
-
-            }
-
-
-
-
 
             int lastPrevChar = allPrevChars[allPrevChars.Length - 1],
                 lastNextChar = allNextChars[allNextChars.Length - 1];
@@ -161,29 +148,58 @@ namespace Freitas.Octopus.Ordination
                    allNextChars = nextPosition.ToCharArray();
 
             int lastPrevChar = allPrevChars[allPrevChars.Length - 1],
-                lastNextChar = allNextChars[allNextChars.Length - 1];
+                lastNextChar = allNextChars[allNextChars.Length - 1],
+                penultimatePrevChar = allPrevChars[allPrevChars.Length - 2];
 
-            
-            if ((lastPrevChar + jump) > letterZ)
+            if (lastPrevChar == letterZ)
             {
-                int penultimatePrevChar = (int)allPrevChars[allPrevChars.Length - 2];
-                if ((lastNextChar - penultimatePrevChar) == 1)
+                if ((lastNextChar - penultimatePrevChar) > 1)
                 {
-                    //AAAAY
-                    //AAAAAE --este é o valor correto neste caso
-                    //AAAB
-                    char[] allNewChars = new char[allPrevChars.Length + 1];
-                    
+                    //AAAAZ
+                    //AAAB <----
+                    //AAAC
+                    var newPosition = allNextChars;
+                    newPosition[newPosition.Length - 1] = (char)(lastNextChar - 1);
+                    return new string(newPosition);
                 }
                 else
                 {
-                    //AAAAY
-                    //AAACA --este é o valor correto neste caso
-                    //AAAE
+                    //AAAAZ
+                    //AAAAZA <----
+                    //AAAB
+                    var newPosition = new char[allPrevChars.Length + 1];
+                    for (int i = 0; i < allPrevChars.Length; i++)
+                        newPosition[i] = allPrevChars[i];
+                    newPosition[newPosition.Length - 1] = (char)letterA;
+                    return new string(newPosition);
                 }
             }
+            else
+            {
+                if ((lastPrevChar + jump) > letterZ)
+                {
+                    //AAAAY
+                    //AAAAZ <----
+                    //AAAB
 
-            return string.Empty;
+                    //AAAAW
+                    //AAAAY <----
+                    //AAAB
+                    var newPosition = allPrevChars;
+                    int newChar = letterZ - ((letterZ - lastPrevChar) / 2);
+                    newPosition[newPosition.Length - 1] = (char)newChar;
+                    return new string(newPosition);
+                }
+                else
+                {
+                    //AAAAE
+                    //AAAAI <----
+                    //AAAB
+                    var newPosition = allPrevChars;
+                    newPosition[newPosition.Length - 1] = (char)(lastPrevChar + jump);
+                    return new string(newPosition);
+                }
+            }
         }
 
         #endregion
