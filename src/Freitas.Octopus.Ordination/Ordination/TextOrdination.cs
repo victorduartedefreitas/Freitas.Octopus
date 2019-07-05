@@ -16,8 +16,8 @@ namespace Freitas.Octopus.Ordination
         #region Fields
 
         private static TextOrdination instance;
-        private int letterA = (int)'A', //65
-                    letterZ = (int)'Z', //90
+        private int letterA = 'A', //65
+                    letterZ = 'Z', //90
                     jump = 4;
 
         #endregion
@@ -44,7 +44,7 @@ namespace Freitas.Octopus.Ordination
             if (string.IsNullOrEmpty(previousPosition))
                 return GetFirstPosition();
             else if (string.IsNullOrEmpty(nextPosition))
-                return GetLastPosition(previousPosition.ToUpper());
+                return GetNextPosition(previousPosition.ToUpper());
             else
                 return GetInnerPosition(previousPosition.ToUpper(), nextPosition.ToUpper());
         }
@@ -53,22 +53,24 @@ namespace Freitas.Octopus.Ordination
 
         #region Private Methods
 
+
+
         private string GetFirstPosition()
         {
             return "AAAA";
         }
 
-        private string GetLastPosition(string previousPosition)
+        private string GetNextPosition(string previousPosition)
         {
             var allChars = previousPosition.ToCharArray();
             for (int i = previousPosition.Length - 1; i >= 0; i--)
             {
                 if (allChars[i] != letterZ && (allChars[i] + jump) > letterZ)
                 {
-                    allChars[i] = 'Z';
-                    continue;
+                    allChars[i] = (char)(allChars[i] + (letterZ - allChars[i]));
+                    break;
                 }
-                else if (allChars[i] == letterZ)
+                else if (i == (previousPosition.Length - 1) && allChars[i] == letterZ)
                 {
                     allChars[i] = 'A';
                     continue;
@@ -95,6 +97,25 @@ namespace Freitas.Octopus.Ordination
         {
             char[] allPrevChars = previousPosition.ToCharArray(),
                    allNextChars = nextPosition.ToCharArray();
+
+            //elimina os caracteres iniciais que são iguais, e vou trabalhar apenas com os últimos caracteres que são diferentes
+            int initEquals = 0;
+            for (int i = 0; i < allPrevChars.Length; i++)
+            {
+                if (allPrevChars[i] == allNextChars[i])
+                    initEquals++;
+                else
+                    break;
+            }
+
+            for (int i = allPrevChars.Length - 1; i > initEquals; i--)
+            {
+
+            }
+
+
+
+
 
             int lastPrevChar = allPrevChars[allPrevChars.Length - 1],
                 lastNextChar = allNextChars[allNextChars.Length - 1];
