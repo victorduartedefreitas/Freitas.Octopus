@@ -3,6 +3,10 @@ Generate position values for your collection items.
 
 You can download this library on NuGet: Freitas.Octopus (https://www.nuget.org/packages/Freitas.Octopus)
 
+## Why you need this library?
+
+Have you ever need to organize many items in a collection, and had trouble using sort by numbers when move the items from their positions? Freitas.Octopus provides position codes based on letters, that are much better than numbers.
+
 ### Now, you may be wondering: how can I use Freitas.Octopus? Follow me, I'll teach you!
 
 First of all, you have to create a listitem class (or modify your current listitem class) that implements `IOctopusItem` interface.
