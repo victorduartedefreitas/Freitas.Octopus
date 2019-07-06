@@ -1,7 +1,14 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Authors>Victor Duarte de Freitas</Authors>
+    <Description>Provides position codes based on letters to organize items in a collection. With this, you can organize and fluently move items up and down in collections.</Description>
+    <Copyright>Victor Duarte de Freitas</Copyright>
+    <PackageProjectUrl>https://github.com/victorduartedefreitas/Freitas.Octopus</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/victorduartedefreitas/Freitas.Octopus</RepositoryUrl>
+    <NeutralLanguage>en</NeutralLanguage>
+    <PackageTags>freitas octopus list sort sorting lettersorting collection</PackageTags>
   </PropertyGroup>
 
 </Project>

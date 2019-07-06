@@ -41,11 +41,11 @@
             if (string.IsNullOrEmpty(previousPosition) && string.IsNullOrEmpty(nextPosition))
                 return GetFirstPosition();
             else if (!string.IsNullOrEmpty(previousPosition) && string.IsNullOrEmpty(nextPosition))
-                return GetNextPosition(previousPosition.ToUpper());
+                return GetNextPosition(previousPosition.ToUpper(), new string('Z', previousPosition.Length + 1), string.Empty);
             else if (string.IsNullOrEmpty(previousPosition) && !string.IsNullOrEmpty(nextPosition))
-                return GetInnerPosition("AAAA", nextPosition.ToUpper());
+                return GetNextPosition("AAAA", nextPosition.ToUpper(), string.Empty);
             else
-                return GetInnerPosition(previousPosition.ToUpper(), nextPosition.ToUpper());
+                return GetNextPosition(previousPosition.ToUpper(), nextPosition.ToUpper(), string.Empty);
         }
 
         #endregion
@@ -57,149 +57,120 @@
             return "AAAB";
         }
 
-        private string GetNextPosition(string previousPosition)
+        private string GetNextPosition(string previousPosition, string nextPosition, string currentPosition)
         {
-            var allChars = previousPosition.ToCharArray();
-            for (int i = previousPosition.Length - 1; i >= 0; i--)
+            if (!string.IsNullOrEmpty(currentPosition))
             {
-                if (allChars[i] != letterZ && (allChars[i] + jump) > letterZ)
-                {
-                    allChars[i] = (char)(allChars[i] + (letterZ - allChars[i]));
-                    break;
-                }
-                else if (i == (previousPosition.Length - 1) && allChars[i] == letterZ)
-                {
-                    allChars[i] = (char)letterA;
-                    continue;
-                }
+                int compareToPrevious = currentPosition.CompareTo(previousPosition),
+                compareToNext = currentPosition.CompareTo(nextPosition);
 
-                if ((char)(allChars[i] + jump) > letterZ)
-                {
-                    allChars[i - 1] = (char)(allChars[i - 1] + jump);
-                    allChars[i] = (char)letterA;
-                }
-                else
-                {
-                    allChars[i] = (char)(allChars[i] + jump);
-                }
-
-                break;
+                if (compareToPrevious > 0 && compareToNext < 0)
+                    return currentPosition;
             }
 
-            return new string(allChars);
-        }
-
-        private string GetInnerPosition(string previousPosition, string nextPosition)
-        {
-            if (previousPosition.Length == nextPosition.Length)
-                return GetInnerPositionSameLenght(previousPosition, nextPosition);
-            else if (nextPosition.Length > previousPosition.Length)
-                return GetInnerPositionNextGTPrevious(previousPosition, nextPosition);
-            else
-                return GetInnerPositionPreviousGTNext(previousPosition, nextPosition);
-        }
-
-        private string GetInnerPositionSameLenght(string previousPosition, string nextPosition)
-        {
-            char[] allPrevChars = previousPosition.ToCharArray(),
-                   allNextChars = nextPosition.ToCharArray();
-
-            int lastPrevChar = allPrevChars[allPrevChars.Length - 1],
-                lastNextChar = allNextChars[allNextChars.Length - 1];
-
+            var allPrevChars = previousPosition.ToCharArray();
+            var allNextChars = nextPosition.ToCharArray();
             int newChar;
-            if ((lastNextChar - lastPrevChar) > 1)
+
+            if (previousPosition.Length > nextPosition.Length)
             {
-                newChar = lastPrevChar + ((lastNextChar - lastPrevChar) / 2);
-                var newPosition = allPrevChars;
-                newPosition[newPosition.Length - 1] = (char)newChar;
-                return new string(newPosition);
+                for (int i = previousPosition.Length - 1; i >= 0; i--)
+                {
+                    int currentPrevChar = allPrevChars[i],
+                        currentNextChar = i <= allNextChars.Length - 1 ? allNextChars[i] : 0,
+                        currentPrevChar2 = i > 0 ? allPrevChars[i - 1] : currentPrevChar;
+
+                    if (currentPrevChar == letterZ)
+                    {
+                        if ((currentNextChar - currentPrevChar2) > 1)
+                        {
+                            var tryNewPosition = allNextChars;
+                            tryNewPosition[tryNewPosition.Length - 1] = (char)(currentNextChar - 1);
+                            var newPosition = GetNextPosition(previousPosition, nextPosition, new string(tryNewPosition));
+                            if (!string.IsNullOrEmpty(newPosition))
+                                return newPosition;
+                        }
+                        else
+                        {
+                            var tryNewPosition = new char[allPrevChars.Length + 1];
+                            for (int j = 0; j < allPrevChars.Length; j++)
+                                tryNewPosition[j] = allPrevChars[j];
+                            tryNewPosition[tryNewPosition.Length - 1] = (char)letterA;
+                            var newPosition = GetNextPosition(previousPosition, nextPosition, new string(tryNewPosition));
+                            if (!string.IsNullOrEmpty(newPosition))
+                                return newPosition;
+                        }
+                    }
+                    else
+                    {
+                        if ((currentPrevChar + jump) > letterZ)
+                        {
+                            var tryNewPosition = allPrevChars;
+                            newChar = letterZ - ((letterZ - currentPrevChar) / 2);
+                            tryNewPosition[tryNewPosition.Length - 1] = (char)newChar;
+                            var newPosition = GetNextPosition(previousPosition, nextPosition, new string(tryNewPosition));
+                            if (!string.IsNullOrEmpty(newPosition))
+                                return newPosition;
+                        }
+                        else
+                        {
+                            var tryNewPosition = allPrevChars;
+                            tryNewPosition[tryNewPosition.Length - 1] = (char)(currentPrevChar + jump);
+                            var newPosition = GetNextPosition(previousPosition, nextPosition, new string(tryNewPosition));
+                            if (!string.IsNullOrEmpty(newPosition))
+                                return newPosition;
+                        }
+                    }
+                }
+            }
+            else if (previousPosition.Length < nextPosition.Length)
+            {
+                for (int i = nextPosition.Length - 1; i >= 0; i--)
+                {
+                    int currentNextChar = allNextChars[i];
+
+                    newChar = letterA + ((currentNextChar - letterA) / 2);
+                    var tryNewPosition = new char[allPrevChars.Length + 1];
+                    for (int j = 0; j < allPrevChars.Length; j++)
+                        tryNewPosition[j] = allPrevChars[j];
+
+                    tryNewPosition[tryNewPosition.Length - 1] = (char)newChar;
+                    var newPosition = GetNextPosition(previousPosition, nextPosition, new string(tryNewPosition));
+                    if (!string.IsNullOrEmpty(newPosition))
+                        return newPosition;
+                }
             }
             else
             {
-                var newPosition = new char[allPrevChars.Length + 1];
-                for (int i = 0; i < allPrevChars.Length; i++)
-                    newPosition[i] = allPrevChars[i];
-
-                newPosition[newPosition.Length - 1] = (char)(letterA + jump);
-                return new string(newPosition);
-            }
-        }
-
-        private string GetInnerPositionNextGTPrevious(string previousPosition, string nextPosition)
-        {
-            char[] allPrevChars = previousPosition.ToCharArray(),
-                   allNextChars = nextPosition.ToCharArray();
-
-            int lastNextChar = allNextChars[allNextChars.Length - 1];
-
-            int newChar = letterA + ((lastNextChar - letterA) / 2);
-            var newPosition = new char[allPrevChars.Length + 1];
-            for (int i = 0; i < allPrevChars.Length; i++)
-                newPosition[i] = allPrevChars[i];
-
-            newPosition[newPosition.Length - 1] = (char)newChar;
-            return new string(newPosition);
-        }
-
-        private string GetInnerPositionPreviousGTNext(string previousPosition, string nextPosition)
-        {
-            char[] allPrevChars = previousPosition.ToCharArray(),
-                   allNextChars = nextPosition.ToCharArray();
-
-            int lastPrevChar = allPrevChars[allPrevChars.Length - 1],
-                lastNextChar = allNextChars[allNextChars.Length - 1],
-                penultimatePrevChar = allPrevChars[allPrevChars.Length - 2];
-
-            if (lastPrevChar == letterZ)
-            {
-                if ((lastNextChar - penultimatePrevChar) > 1)
+                for (int i = previousPosition.Length - 1; i >= 0; i--)
                 {
-                    //AAAAZ
-                    //AAAB <----
-                    //AAAC
-                    var newPosition = allNextChars;
-                    newPosition[newPosition.Length - 1] = (char)(lastNextChar - 1);
-                    return new string(newPosition);
-                }
-                else
-                {
-                    //AAAAZ
-                    //AAAAZA <----
-                    //AAAB
-                    var newPosition = new char[allPrevChars.Length + 1];
-                    for (int i = 0; i < allPrevChars.Length; i++)
-                        newPosition[i] = allPrevChars[i];
-                    newPosition[newPosition.Length - 1] = (char)letterA;
-                    return new string(newPosition);
+                    char currentPrevChar = allPrevChars[i],
+                         currentNextChar = allNextChars[i];
+
+                    if ((currentNextChar - currentPrevChar) > 1)
+                    {
+                        newChar = currentPrevChar + ((currentNextChar - currentPrevChar) / 2);
+                        var tryNewPosition = allPrevChars;
+                        tryNewPosition[tryNewPosition.Length - 1] = (char)newChar;
+                        var newPosition = GetNextPosition(previousPosition, nextPosition, new string(tryNewPosition));
+                        if (!string.IsNullOrEmpty(newPosition))
+                            return newPosition;
+                    }
+                    else
+                    {
+                        var tryNewPosition = new char[allPrevChars.Length + 1];
+                        for (int j = 0; j < allPrevChars.Length; j++)
+                            tryNewPosition[j] = allPrevChars[j];
+
+                        tryNewPosition[tryNewPosition.Length - 1] = (char)(letterA + jump);
+                        var newPosition = GetNextPosition(previousPosition, nextPosition, new string(tryNewPosition));
+                        if (!string.IsNullOrEmpty(newPosition))
+                            return newPosition;
+                    }
                 }
             }
-            else
-            {
-                if ((lastPrevChar + jump) > letterZ)
-                {
-                    //AAAAY
-                    //AAAAZ <----
-                    //AAAB
 
-                    //AAAAW
-                    //AAAAY <----
-                    //AAAB
-                    var newPosition = allPrevChars;
-                    int newChar = letterZ - ((letterZ - lastPrevChar) / 2);
-                    newPosition[newPosition.Length - 1] = (char)newChar;
-                    return new string(newPosition);
-                }
-                else
-                {
-                    //AAAAE
-                    //AAAAI <----
-                    //AAAB
-                    var newPosition = allPrevChars;
-                    newPosition[newPosition.Length - 1] = (char)(lastPrevChar + jump);
-                    return new string(newPosition);
-                }
-            }
+            return string.Empty;
         }
 
         #endregion
