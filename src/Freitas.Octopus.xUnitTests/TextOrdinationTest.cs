@@ -1,7 +1,8 @@
+using System;
 using System.Collections.Generic;
-using Xunit;
-using System.Linq;
 using System.Diagnostics;
+using System.Linq;
+using Xunit;
 
 namespace Freitas.Octopus.xUnitTests
 {
@@ -69,6 +70,15 @@ namespace Freitas.Octopus.xUnitTests
                 new Item("LetterY"),
                 new Item("LetterZ")
             };
+        }
+
+        private IList<Item> GetCleanItems2()
+        {
+            var items = new List<Item>();
+            for (long i = 0; i < 500_000; i++)
+                items.Add(new Item($"Item{i}"));
+
+            return items;
         }
 
         [Fact]
@@ -178,6 +188,32 @@ namespace Freitas.Octopus.xUnitTests
             items = items.MoveDown(items[items.Count - 2]);
             items = items.MoveDown(items[items.Count - 3]);
 
+        }
+
+        [Fact]
+        public void InitializeOrderTest()
+        {
+            var gc0 = GC.CollectionCount(0);
+            var gc1 = GC.CollectionCount(1);
+
+            var sw = new Stopwatch();
+            sw.Start();
+
+            var items = GetCleanItems2();
+            items.InitializeOctopusOrdination();
+
+            sw.Stop();
+            var time = sw.ElapsedMilliseconds;
+
+            var gc0_pos = GC.CollectionCount(0) - gc0;
+            var gc1_pos = GC.CollectionCount(1) - gc1;
+
+            string ret = string.Empty;
+
+            foreach (var i in items)
+                ret += $"{i}\r\n";
+
+            ret += $"GC_0:{gc0_pos}; GC_1:{gc1_pos}; Time: {time}ms";
         }
     }
 }

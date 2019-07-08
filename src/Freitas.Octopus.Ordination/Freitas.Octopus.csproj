@@ -9,7 +9,7 @@
     <RepositoryUrl>https://github.com/victorduartedefreitas/Freitas.Octopus</RepositoryUrl>
     <NeutralLanguage>en</NeutralLanguage>
     <PackageTags>freitas octopus list sort sorting lettersorting collection</PackageTags>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
     <PackageReleaseNotes />
     <PackageLicenseUrl>https://github.com/victorduartedefreitas/Freitas.Octopus</PackageLicenseUrl>
   </PropertyGroup>
