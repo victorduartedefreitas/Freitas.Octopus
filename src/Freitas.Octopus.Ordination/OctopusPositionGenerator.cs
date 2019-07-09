@@ -98,14 +98,22 @@
                     {
                         if (i == 0)
                         {
-                            newPositionChars = new char[allPrevChars.Length + totalNewPositions];
-                            for (int j = 0; j < allPrevChars.Length; j++)
-                                newPositionChars[j] = allPrevChars[j];
+                            if (newPositionChars[i] != letterZ)
+                            {
+                                newPositionChars[i] = (char)(letterZ - ((letterZ - newPositionChars[i]) / 2));
+                                return GetNextPosition(previousPosition, nextPosition, new string(newPositionChars));
+                            }
+                            else
+                            {
+                                newPositionChars = new char[allPrevChars.Length + totalNewPositions];
+                                for (int j = 0; j < allPrevChars.Length; j++)
+                                    newPositionChars[j] = allPrevChars[j];
 
-                            for (int j = allPrevChars.Length; j < allPrevChars.Length + totalNewPositions; j++)
-                                newPositionChars[j] = (char)letterA;
+                                for (int j = allPrevChars.Length; j < allPrevChars.Length + totalNewPositions; j++)
+                                    newPositionChars[j] = (char)letterA;
 
-                            return GetNextPosition(previousPosition, nextPosition, new string(newPositionChars));
+                                return GetNextPosition(previousPosition, nextPosition, new string(newPositionChars));
+                            }
                         }
 
                         if (newPositionChars[i] == letterZ)

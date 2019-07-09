@@ -215,5 +215,19 @@ namespace Freitas.Octopus.xUnitTests
 
             ret += $"GC_0:{gc0_pos}; GC_1:{gc1_pos}; Time: {time}ms";
         }
+
+        [Fact]
+        public void MoveDownTest()
+        {
+            var items = GetCleanItems();
+            items.InitializeOctopusOrdination();
+
+            for (int i = 0; i < 267000; i++)
+            {
+                items = items.MoveDown(items[items.Count - 2]);
+            }
+
+
+        }
     }
 }
